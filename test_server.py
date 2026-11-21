@@ -93,7 +93,7 @@ class Tests(unittest.TestCase):
     def test_page_assets_traversal_and_method(self):
         status, headers, body = self.request('/')
         self.assertEqual(status, 200)
-        self.assertIn(b'Welcome to Futubiz', body)
+        self.assertIn(b'PRACTICE TERMINAL', body)
         self.assertIn("default-src 'self'", headers['Content-Security-Policy'])
         self.assertEqual(self.request('/app.js')[0], 200)
         self.assertEqual(self.request('/%2e%2e/server.py')[0], 404)
