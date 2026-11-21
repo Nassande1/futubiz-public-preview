@@ -182,6 +182,9 @@ class Handler(BaseHTTPRequestHandler):
         if not self.allowed(quote=parsed.path == "/api/quotes"):
             return
         if parsed.path == "/api/quotes":
+            if os.environ.get("DISABLE_QUOTES") == "1":
+                self.json_response(503, {"error": "Quote service disabled pending provider permission"})
+                return
             if parsed.query:
                 self.json_response(400, {"error": "Query parameters are not supported"})
                 return
