@@ -22,7 +22,7 @@
     even:{title:'Even / Odd', explanation:'Even wins on 0, 2, 4, 6 or 8. Odd wins on 1, 3, 5, 7 or 9.', names:['Even','Odd'], kinds:['even','odd']},
     over:{title:'Over / Under', explanation:'Over wins above your selected digit. Under wins below it; equality loses.', names:['Over ↑','Under ↓'], kinds:['over','under']}
   };
-  let category='rise';
+  let category='even';
   const counts = (kind,b) => kind==='over'?9-b:kind==='under'?b:kind==='matches'?1:kind==='differs'?9:5;
   const isWin = (kind,d,b) => kind==='over'?d>b:kind==='under'?d<b:kind==='matches'?d===b:kind==='differs'?d!==b:kind==='even'?d%2===0:kind==='odd'?d%2===1:kind==='rise'?d>=5:d<5;
   function validAmount(raw) {const n=Number(raw); return raw.trim()!=='' && Number.isFinite(n) && n>=0.01 && n<=1000000 && Math.abs(n*100-Math.round(n*100))<0.00001;}
@@ -71,6 +71,7 @@
   function render() {
     $('balance').textContent=money(state.balance);document.querySelectorAll('.balance-copy').forEach(e=>e.textContent=money(state.balance));
     renderHistory($('recentHistory'),state.history.slice(0,3));renderHistory($('history'),state.history);
+    document.querySelectorAll('[data-digit]').forEach(e=>{const n=Number(e.dataset.digit), count=state.digits.filter(d=>d===n).length;e.querySelector('span').textContent=state.digits.length?(100*count/state.digits.length).toFixed(1)+'%':'—';});
     $('storageStatus').textContent=storageOK?'Your demo balance and history are saved in this browser only, with no online sync. Multiple tabs can overwrite one another.':'Browser storage is unavailable; changes last only while this page remains open.';
     updateOptions();
   }
@@ -92,10 +93,10 @@
     const canvas=$('chart'),r=canvas.getBoundingClientRect();if(!r.width||!r.height)return;
     const ratio=window.devicePixelRatio||1;canvas.width=Math.round(r.width*ratio);canvas.height=Math.round(r.height*ratio);
     const c=canvas.getContext('2d');if(!c)return;c.setTransform(ratio,0,0,ratio,0,0);const w=r.width,h=r.height;
-    c.strokeStyle='#303649';c.lineWidth=1;for(let i=1;i<5;i++){c.beginPath();c.moveTo(0,h*i/5);c.lineTo(w,h*i/5);c.stroke();}for(let i=1;i<5;i++){c.beginPath();c.moveTo(w*i/5,0);c.lineTo(w*i/5,h);c.stroke();}
+    c.strokeStyle='transparent';c.lineWidth=1;for(let i=1;i<5;i++){c.beginPath();c.moveTo(0,h*i/5);c.lineTo(w,h*i/5);c.stroke();}for(let i=1;i<5;i++){c.beginPath();c.moveTo(w*i/5,0);c.lineTo(w*i/5,h);c.stroke();}
     const lo=Math.min(...points),hi=Math.max(...points),x=i=>i*(w-16)/(points.length-1)+8,y=v=>20+(hi-v)/(hi-lo||1)*(h-40);
-    c.beginPath();points.forEach((v,i)=>i?c.lineTo(x(i),y(v)):c.moveTo(x(i),y(v)));c.lineTo(x(points.length-1),h);c.lineTo(x(0),h);c.closePath();const gradient=c.createLinearGradient(0,0,0,h);gradient.addColorStop(0,'rgba(153,135,255,.30)');gradient.addColorStop(1,'rgba(153,135,255,0)');c.fillStyle=gradient;c.fill();
-    c.beginPath();points.forEach((v,i)=>i?c.lineTo(x(i),y(v)):c.moveTo(x(i),y(v)));c.strokeStyle='#ad9cff';c.lineWidth=2;c.stroke();c.beginPath();c.arc(x(points.length-1),y(points[points.length-1]),4,0,Math.PI*2);c.fillStyle='#d2c8ff';c.fill();$('price').textContent=price.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+    c.beginPath();points.forEach((v,i)=>i?c.lineTo(x(i),y(v)):c.moveTo(x(i),y(v)));c.lineTo(x(points.length-1),h);c.lineTo(x(0),h);c.closePath();const gradient=c.createLinearGradient(0,0,0,h);gradient.addColorStop(0,'rgba(55,190,95,.10)');gradient.addColorStop(1,'rgba(55,190,95,0)');c.fillStyle=gradient;c.fill();
+    c.beginPath();points.forEach((v,i)=>i?c.lineTo(x(i),y(v)):c.moveTo(x(i),y(v)));c.strokeStyle='#44bc67';c.lineWidth=2;c.stroke();c.beginPath();c.arc(x(points.length-1),y(points[points.length-1]),4,0,Math.PI*2);c.fillStyle='#65d889';c.fill();$('price').textContent=price.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
   }
   setInterval(()=>{price=Math.max(1,price+(Math.random()-.5)*5);points.push(price);points.shift();if($('page-trade').classList.contains('active'))draw();},2500);
   window.addEventListener('resize',draw);$('market').addEventListener('change',draw);render();requestAnimationFrame(draw);
