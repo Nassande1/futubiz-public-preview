@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: futubiz-practice-preview
+    runtime: python
+    plan: free
+    buildCommand: python -m py_compile server.py
+    startCommand: python server.py --host 0.0.0.0
+    healthCheckPath: /
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.8
+      - key: TRUST_RENDER_PROXY
+        value: "1"
